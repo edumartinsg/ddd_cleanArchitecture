@@ -3,3 +3,7 @@
 ## Entities =>
 
 ## Use cases =>
+
+## Clean Architecture
+
+![alt text](./imgs/image.png)
