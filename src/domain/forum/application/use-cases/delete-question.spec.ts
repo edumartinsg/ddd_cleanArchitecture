@@ -1,19 +1,18 @@
-import { EditQuestionUseCase } from "../edit-question"
+import { DeleteQuestionUseCase } from "./delete-question"
 import { InMemoryQuestionsRepository } from "test/repositories/in-memory-questions-repository"
 import { makeQuestion } from "test/factories/make-question"
 import { UniqueEntityID } from "@/core/entities/unique-entity-id"
-import { title } from "process"
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository
-let sut: EditQuestionUseCase
+let sut: DeleteQuestionUseCase
 
-describe("Edit Question", () => {
+describe("Delete Question", () => {
   beforeEach(() => {
     inMemoryQuestionsRepository = new InMemoryQuestionsRepository()
-    sut = new EditQuestionUseCase(inMemoryQuestionsRepository)
+    sut = new DeleteQuestionUseCase(inMemoryQuestionsRepository)
   })
 
-  it("should be able to edit a question", async () => {
+  it("should be able to delete a question", async () => {
     const newQuestion = makeQuestion(
       {
         authorId: new UniqueEntityID("author-1"),
@@ -24,19 +23,14 @@ describe("Edit Question", () => {
     await inMemoryQuestionsRepository.create(newQuestion)
 
     await sut.execute({
-      questionId: newQuestion.id.toValue(),
+      questionId: "question-1",
       authorId: "author-1",
-      content: "New content",
-      title: "New title",
     })
 
-    expect(inMemoryQuestionsRepository.items[0].content).toMatchObject({
-      title: "New title",
-      content: "New content",
-    })
+    expect(inMemoryQuestionsRepository.items).toHaveLength(0)
   })
 
-  it("should not be able to edit a question from another user", async () => {
+  it("should not be able to delete a question from another user", async () => {
     const newQuestion = makeQuestion(
       {
         authorId: new UniqueEntityID("author-1"),
@@ -50,8 +44,6 @@ describe("Edit Question", () => {
       return sut.execute({
         questionId: "question-1",
         authorId: "author-2",
-        content: "New content",
-        title: "New title",
       })
     }).rejects.toBeInstanceOf(Error)
   })
